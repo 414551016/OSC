@@ -29,7 +29,7 @@ QEMU virt → OpenSBI → kernel (0x80200000) → _start → main() → UART She
 ---
 
 # Project Structure
-
+```text
 Lab1/
 ├── Makefile
 ├── README.md
@@ -53,7 +53,7 @@ Lab1/
     ├── sbi.c
     ├── uart_opi.c
     └── uart_qemu.c
-
+```
 ---
 
 # Environment
