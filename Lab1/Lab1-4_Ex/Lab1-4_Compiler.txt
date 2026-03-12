@@ -1,0 +1,65 @@
+Lab1-4/
+├── Makefile            # 編譯與打包
+├── linker.ld           # 記憶體配置
+├── kernel.its          # 產生 kernel.fit
+├── x1_orangepi-rv2.dtb
+├── include/
+│   ├── sbi.h        # SBI 宣告與常數
+│   ├── shell.h
+│   ├── string.h
+│   └── uart.h
+└── src/
+    ├── init.c      # 清除 .bss
+    ├── main.c      # 初始化 UART，進入 shell
+    ├── sbi.c       # Exercise 4 核心，實作 sbi_ecall
+    ├── shell.c     # Exercise 3 的 shell 邏輯
+    ├── start.S     # 自己寫簡單字串函式
+    ├── string.c    # kernel 入口，設定 stack，清 .bss，進入 main
+    └── uart.c      # Exercise 2 的 UART driver
+
+
+你的 boot 流程現在是：
+WSL 測試流程：
+make run
+   ↓
+QEMU virt
+   ↓
+OpenSBI
+   ↓
+kernel (0x80200000)
+   ↓
+_start
+   ↓
+main()
+   ↓
+shell
+
+OrangePi RV2 流程：
+SD Card
+   ↓
+U-Boot
+   ↓
+kernel.fit
+   ↓
+kernel (0x00200000)
+   ↓
+_start
+   ↓
+clear_bss
+   ↓
+main()
+   ↓
+shell_run()
+   ↓
+interactive shell
+
+
+Lab：Exercise 4 新增：info command
+直接將 Exercise 4 接在目前已成功的 Exercise 3 shell 上。
+
+
+
+
+
+
+
