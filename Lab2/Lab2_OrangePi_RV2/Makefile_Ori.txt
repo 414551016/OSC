@@ -1,0 +1,38 @@
+CROSS   ?= riscv64-unknown-elf	
+CC      := $(CROSS)-gcc			
+OBJCOPY := $(CROSS)-objcopy		
+
+BOARD ?= rv2					
+
+ifeq ($(BOARD),rv2)
+BOOT_BASE := 0x00200000
+LOAD_ADDR := 0x20000000
+else ifeq ($(BOARD),qemu)
+BOOT_BASE := 0x80200000
+LOAD_ADDR := 0x82000000
+else
+$(error BOARD must be rv2 or qemu)
+endif
+
+CFLAGS := -Wall -Wextra -O0 -g \
+          -ffreestanding -nostdlib -nostartfiles \
+          -march=rv64gc -mabi=lp64 -mcmodel=medany -fno-pie \
+          -DBOOT_BASE=$(BOOT_BASE) -DLOAD_ADDR=$(LOAD_ADDR)
+
+LDFLAGS := -nostdlib -no-pie -T linker.ld
+
+FIT_DTB ?= x1_orangepi-rv2.dtb
+
+all: bootloader.bin
+
+bootloader.elf: start.S bootloader.c linker.ld
+	$(CC) $(CFLAGS) $(LDFLAGS) start.S bootloader.c -o $@
+
+bootloader.bin: bootloader.elf
+	$(OBJCOPY) -O binary $< $@
+
+kernel.fit: bootloader.bin initramfs.cpio kernel.its $(FIT_DTB)
+	mkimage -f kernel.its kernel.fit
+
+clean:
+	rm -f bootloader.elf bootloader.bin kernel.fit

@@ -1,0 +1,60 @@
+/dts-v1/;
+
+/ {
+    description = "Orange Pi RV2 Lab2 bootloader FIT";
+    #address-cells = <1>;
+
+    images {
+        kernel_1 {
+            description = "Lab2 UART bootloader";
+            data = /incbin/("bootloader.bin");
+            type = "kernel";
+            arch = "riscv";
+            os = "linux";
+            compression = "none";
+            load = <0x00200000>;
+            entry = <0x00200000>;
+            hash_1 {
+                algo = "sha256";
+            };
+        };
+
+        fdt_1 {
+            description = "x1_orangepi-rv2";
+            data = /incbin/("x1_orangepi-rv2.dtb");
+            type = "flat_dt";
+            arch = "riscv";
+            compression = "none";
+            hash_1 {
+                algo = "sha256";
+            };
+        };
+
+        ramdisk_1 {
+            description = "initramfs";
+            data = /incbin/("initramfs.cpio");
+            type = "ramdisk";
+            arch = "riscv";
+            os = "linux";
+            compression = "none";
+            load = <0x46100000>;
+            hash_1 {
+                algo = "sha256";
+            };
+        };
+    };
+
+    configurations {
+        default = "conf_1";
+
+        conf_1 {
+            description = "x1_orangepi-rv2";
+            kernel = "kernel_1";
+            fdt = "fdt_1";
+            ramdisk = "ramdisk_1";
+            hash_1 {
+                algo = "sha256";
+            };
+        };
+    };
+};

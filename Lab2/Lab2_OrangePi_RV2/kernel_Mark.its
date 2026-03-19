@@ -1,0 +1,61 @@
+/dts-v1/; // 指定 Device Tree 語法版本為第 1 版 [cite: 1]
+
+/ {
+    description = "Orange Pi RV2 Lab2 bootloader FIT"; // 此 FIT 映像檔的文字描述 [cite: 1]
+    #address-cells = <1>; // 指定子節點中位址屬性（如 load/entry）所佔用的 32 位元單元數量為 1 [cite: 1]
+
+    images { // 定義所有要包含在 FIT 內的二進位檔案組件 [cite: 2]
+        
+        kernel_1 { // 內核/引導程式組件的標籤名稱
+            description = "Lab2 UART bootloader"; // 對此特定映像檔的描述 [cite: 2]
+            data = /incbin/("bootloader.bin"); // 包含外部二進位檔案 "bootloader.bin" [cite: 3]
+            type = "kernel"; // 映像檔類型，這裡被定義為內核 [cite: 3]
+            arch = "riscv"; // 目標硬體架構為 RISC-V [cite: 3]
+            os = "linux"; // 目標作業系統為 Linux（儘管它可能只是個 bootloader） [cite: 3]
+            compression = "none"; // 檔案未經壓縮處理 [cite: 3]
+            load = <0x00200000>; // 載入到記憶體中的實體起始位址 [cite: 3]
+            entry = <0x00200000>; // 程式執行的入口點位址 [cite: 4]
+            hash_1 { // 定義雜湊校驗，確保資料完整性
+                algo = "sha256"; // 使用 SHA256 演算法進行校驗 [cite: 4, 5]
+            };
+        };
+
+        fdt_1 { // 裝置樹（Flattened Device Tree）組件的標籤名稱
+            description = "x1_orangepi-rv2"; // 裝置樹的描述 [cite: 6]
+            data = /incbin/("x1_orangepi-rv2.dtb"); // 包含編譯好的裝置樹二進位檔 (.dtb) [cite: 6]
+            type = "flat_dt"; // 映像檔類型為裝置樹 (FDT) [cite: 6]
+            arch = "riscv"; // 目標架構為 RISC-V [cite: 6]
+            compression = "none"; // 未壓縮 [cite: 6]
+            hash_1 { // FDT 的雜湊校驗
+                algo = "sha256"; // 使用 SHA256 演算法 [cite: 7, 8]
+            };
+        };
+
+        ramdisk_1 { // 虛擬磁碟（Ramdisk）組件的標籤名稱
+            description = "initramfs"; // 描述為初始化記憶體檔案系統 [cite: 9]
+            data = /incbin/("initramfs.cpio"); // 包含 cpio 格式的檔案系統映像 [cite: 9]
+            type = "ramdisk"; // 映像檔類型為虛擬磁碟 [cite: 9]
+            arch = "riscv"; // 目標架構為 RISC-V [cite: 9]
+            os = "linux"; // 用於 Linux 系統 [cite: 9]
+            compression = "none"; // 未壓縮 [cite: 9]
+            load = <0x46100000>; // Ramdisk 在記憶體中的載入位址 [cite: 9]
+            hash_1 { // Ramdisk 的雜湊校驗
+                algo = "sha256"; // 使用 SHA256 演算法 [cite: 10, 11]
+            };
+        };
+    };
+
+    configurations { // 定義如何組合上述映像檔的配置區段 [cite: 12]
+        default = "conf_1"; // 指定預設使用的配置方案名稱為 "conf_1" [cite: 12]
+        
+        conf_1 { // 配置方案 "conf_1" 的具體定義 [cite: 12]
+            description = "x1_orangepi-rv2"; // 配置方案的描述 [cite: 12]
+            kernel = "kernel_1"; // 此配置使用的內核映像標籤 [cite: 12]
+            fdt = "fdt_1"; // 此配置使用的裝置樹映像標籤 [cite: 13]
+            ramdisk = "ramdisk_1"; // 此配置使用的虛擬磁碟映像標籤 [cite: 13]
+            hash_1 { // 對整個配置組合進行雜湊校驗
+                algo = "sha256"; // 使用 SHA256 演算法 [cite: 13, 14]
+            };
+        };
+    };
+};
