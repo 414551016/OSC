@@ -8,3 +8,13 @@
 - 確認是否成功 wsl -l -v
 - 查看可用版本：wsl --list --online
 - 安裝 Ubuntu 22.04：wsl --install -d Ubuntu-22.04
+- OS Lab
+  - sudo apt update
+  - sudo apt upgrade -y
+  - sudo apt install build-essential git
+
+<ol>
+<li>Bird</li>
+<li>McHale</li>
+<li>Parish</li>
+</ol>
