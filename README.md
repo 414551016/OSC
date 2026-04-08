@@ -50,3 +50,6 @@
   qemu-system-riscv64 --version
   dtc --version
   ```
+
+## 建議的目錄配置
+- mkdir -p ~/OscLab0
