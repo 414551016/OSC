@@ -13,8 +13,4 @@
   - sudo apt upgrade -y
   - sudo apt install build-essential git
 
-<ol>
-<li>Bird</li>
-<li>McHale</li>
-<li>Parish</li>
-</ol>
+
