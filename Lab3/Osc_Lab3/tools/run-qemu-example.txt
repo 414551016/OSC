@@ -1,0 +1,7 @@
+這個檔案只是備忘錄，不是正式腳本。
+
+若你想先在 QEMU 驗證最小 kernel 架構，
+可以另外做一個 qemu 專用 UART base 與 machine 設定。
+
+但因為你目標是 Orange Pi RV2，
+本模板主軸仍以板上實測為主。

@@ -1,0 +1,77 @@
+最小可驗證版：完整目錄結構
+osc-lab3-min/
+├── Makefile
+├── linker.ld
+├── include/
+│   ├── common.h
+│   ├── uart.h
+│   ├── printk.h
+│   └── startup_alloc.h
+├── src/
+│   ├── start.S
+│   ├── main.c
+│   ├── uart.c
+│   ├── printk.c
+│   └── startup_alloc.c
+└── tools/
+    └── run-qemu-example.txt
+
+
+六、最小可驗證版：WSL 需要哪些工具
+sudo apt update
+sudo apt install -y make gcc-riscv64-unknown-elf binutils-riscv64-unknown-elf
+sudo apt install -y gcc-riscv64-linux-gnu binutils-riscv64-linux-gnu
+riscv64-unknown-elf-gcc --version
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+usbipd list
+usbipd bind --force --busid 5-3
+usbipd attach --wsl --busid 5-3
+
+lsblk
+
+ls -al kernel.*
+sudo mkdir -p /mnt/sdcard
+sudo mount -t ext4 /dev/sde1 /mnt/sdcard
+sudo rm -f /mnt/sdcard/kernel.fit
+sudo cp kernel.bin /mnt/sdcard/
+ls -al /mnt/sdcard
+
+sudo mkdir -p /mnt/sdcard
+sudo mount -t ext4 /dev/sde1 /mnt/sdcard
+ls -al /mnt/sdcard
+sudo rm -f /mnt/sdcard/kernel.fit
+sudo cp kernel.fit /mnt/sdcard/
+ls -al /mnt/sdcard
+
+sync
+sudo umount /mnt/sdcard/
+
+
+
+sudo screen /dev/ttyUSB0 115200
+
+sudo python3 send_kernel.py /dev/ttyUSB0 kernal.bin
+
+
+
+make clean && make
+
+
+
+
+
+
