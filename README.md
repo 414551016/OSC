@@ -43,4 +43,10 @@
   qemu-system-riscv64 --version
   dtc --version
   ```
-- 
+- 檢查工具有沒有裝好
+  ```
+  riscv64-unknown-elf-gcc --version
+  riscv64-linux-gnu-gcc --version
+  qemu-system-riscv64 --version
+  dtc --version
+  ```
