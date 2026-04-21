@@ -101,7 +101,7 @@ Setup includes:
 > ✅ **Todo**  
 > Add command `exec` that can load the [user program](images/prog.bin?raw=1)  
 > <https://github.com/nycu-caslab/OSC2026/raw/main/uploads/prog.bin>  
-> in the initramfs and run it in U-mode.
+> in the initramfs. Then, run it in U-mode by steps mentioned above.
 
 ---
 
@@ -109,9 +109,9 @@ Setup includes:
 
 When the user program executes an `ecall`, it traps to the S-mode handler. You need to:
 
-- Ensure `stvec` points to your trap handler
-- Save user context (`x1–x31`, `sepc`, `sstatus`)
-- Print diagnostic info from `scause`, `sepc`, and `stval`
+- Before entering U-mode, ensure stvec is pointing to your trap handler assembly routine.
+- Save user context (`x1-x31`, `sepc`, `sstatus`)
+- Print diagnostic info from `scause`, `sepc`, `stval`
 - Restore context and return to user using `sret`
 
 > ✅ **Todo**  
@@ -144,9 +144,21 @@ Result example:The result would be like this:
 
 ---
 
-## Basic Exercise 3 – UART Interrupt (30%)
+## Basic Exercise 3 - OrangePi RV2 UART0 Interrupt - 30%
 
-Make UART I/O asynchronous using PLIC interrupts and ring buffers.
+Currently, your uart_getc and uart_puts are likely blocking (busy-waiting). You must make them asynchronous using PLIC interrupts and ring buffers.
+
+Enable UART0 interrupt via:
+- UART interrupt enable register (check OrangePi RV2 SoC manual or DTS; likely UART0.IER)
+- Enable UART interrupt ID (e.g., 10) in the PLIC
+- Set sie.SEIE and enable external interrupts globally
+
+Steps:
+1. Setup read/write buffers.
+2. Implement ISR for UART RX and TX.
+3. In RX, place incoming bytes in buffer.
+4. In TX, send data from buffer when ready.
+5. In the PLIC, read the Claim register to get the IRQ number, handle it, and write the IRQ number back to the Complete register.
 
 > ✅ **Todo**  
 > Implement the asynchronous UART read/write by interrupt handlers.
