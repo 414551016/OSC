@@ -169,13 +169,29 @@ Steps:
 
 ## Advanced Exercise 1 – Timer Multiplexing (20%)
 
+Timers can be used to do periodic jobs such as scheduling and journaling and one-shot executing such as sleeping and timeout. However, the number of hardware timers is limited. Therefore, the kernel needs a software mechanism to multiplex the timer.
+
+One simple way is using a periodic timer. The kernel can use the tick period as the time unit and calculate the corresponding timeout tick. For example, suppose the periodic timer’s frequency is 1000HZ and a process sleeps for 1.5 seconds. The kernel can add a wake-up event at the moment that 1500 ticks after the current tick.
+
+However, when the tick frequency is too low, the timer has a bad resolution. Then, it can’t be used for time-sensitive jobs. When the tick frequency is too high, it introduces a lot of overhead for redundant timer interrupt handling.
+
+Another way is using a one-shot timer. When someone needs a timeout event, a timer is inserted into a timer queue. If the timeout is earlier than the previous programed expired time, the kernel reprograms the hardware timer to the earlier one. In the timer interrupt handler, it executes the expired timer’s callback function.
+
+In this advanced part, you need to implement the timer API that a user can register the callback function when the timeout using the one-shot timer(the core timer is a one-shot timer). The API and its use case should look like the below pseudo code.
+
 Implement a one-shot timer-based timer API.
 
 ```c
 void add_timer(void (*callback)(void*), void* arg, int sec){
     ...
 }
+
+//An example use case
+void sleep(int duration){
+    add_timer(wakeup, current_process, duration);
+}
 ```
+To test the API, you need to implement the shell command `setTimeout SECONDS MESSAGE`. It prints MESSAGE after SECONDS with the current time and the command executed time.
 
 Shell command to test:
 
@@ -187,10 +203,9 @@ setTimeout SECONDS MESSAGE
 > Implement the `setTimeout` command with the timer API.
 
 > ❗ **Important**  
-> `setTimeout` is **non-blocking**. Users can set multiple timeouts.  
-> The printing order is determined by the command executed time and the user-specified seconds.
+> `setTimeout` is non-blocking. Users can set multiple timeouts. The printing order is determined by the command executed time and the user-specified SECONDS.
 
-Example:
+Example:This is an example
 
 ![](images/lab4_adv1.png)
 
@@ -198,27 +213,70 @@ Example:
 
 ## Advanced Exercise 2 – Concurrent I/O Devices Handling (20%)
 
+The kernel needs to handle a lot of I/O devices at the same time. For devices(e.g. UART) that have a short period of process time, the kernel can finish their handlers immediately right after they’re ready. However, for those devices(e.g. network interface controller) that require a longer time for the follow-up processing, the kernel needs to schedule the execution order.
+
+Usually, we want to use the first come first serve principle to prevent starvation. However, we may also want prioritized execution for some critical handlers. In this part, you need to know how to implement it using a single thread(i.e. a single stack).
+
 ### Decouple the Interrupt Handlers
 
+A simpler way to implement an interrupt handler is processing all the device’s data one at a time with interrupts disabled. However, a less critical interrupt handler can block a more critical one for a long time. Hence, we want to decouple the interrupt handler and the actual processing.
+
+This can be achieved by a task queue. In the interrupt handler, the kernel
+
+1. masks the device’s interrupt line,
+2. move data from the device’s buffer through DMA, or manually copy,
+3. enqueues the processing task to the event queue,
+4. do the tasks with interrupts enabled,
+5. unmasks the interrupt line to get the next interrupt at the end of the task.
+
+Those tasks in the queue can be processed when the system is idle. Also, the kernel can execute the task in any order such as FIFO or LIFO.
+
 > ✅ **Todo**  
-> Implement a task queue mechanism so interrupt handlers can enqueue processing tasks.
+> Implement a task queue mechanism, so interrupt handlers can add their processing tasks to it.
 
 ---
 
 ### Nested Interrupt
 
+The tasks in the queue can be executed at any time, but we want them to be executed as soon as possible. It’s because that a high-priority process may be waiting for the data.
+
+Therefore, before the interrupt handler return to the user program, it should execute the tasks in the interrupt context with interrupts enabled (otherwise, critical interrupts are blocked). Then, the interrupt handler may be nested. Hence, besides general-purpose registers, you should also save sstatus and sepc so the previously saved data are preserved.
+
 > ✅ **Todo**  
-> Execute the queued tasks before returning to the user program, with interrupts enabled.
+> Execute the tasks in the queue before returning to the user program with interrupts enabled.
 
 ---
 
 ### Preemption
 
+Now, any interrupt handler can preempt the task’s execution, but the newly enqueued task still needs to wait for the currently running task’s completion. It’d be better if the newly enqueued task with a higher priority can preempt the currently running task.
+
+To achieve the preemption, the kernel can check the last executing task’s priority before returning to the previous interrupt handler. If there are higher priority tasks, execute the highest priority task.
+
+> ✅ **Todo**  
+> Implement the task queue’s preemption mechanism.
+
+In this advanced part, you need to implement the task API that the kernel can register a callback function with priority. The API and its use case should look like the below pseudo code.
+
 Task API:
 
 ```c
+//An example API
 typedef void (*task_callback_t)(void *arg);
 void add_task(task_callback_t callback, void *arg, int priority) {
+  ...
+}
+
+//An example use case
+void test_task_cb(void *arg) {
+    uart_puts("[Task] Executing Priority ");
+    uart_putc((char*)arg);
+    uart_putc("\n");
+}
+
+void main(...){
+    ...
+    add_task(test_task_cb, "3", 3);
     ...
 }
 ```
