@@ -117,7 +117,7 @@ When the user program executes an `ecall`, it traps to the S-mode handler. You n
 > ✅ **Todo**  
 > Set the vector table and implement the exception handler.
 
-Result example:
+Result example:The result would be like this:
 
 ![](images/lab4_b1.png)
 
