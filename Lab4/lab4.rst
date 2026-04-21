@@ -40,7 +40,7 @@ Exception Levels (Privilege Modes)
 RISC-V defines privilege modes to isolate different system components.
 In our OS design, the kernel executes in **Supervisor mode (S-mode)**, while user applications execute in **User mode (U-mode)**.
 
-.. image:: /images/RISC_privilege.png
+.. image:: https://github.com/414551016/Operating-System-Capstone/blob/main/Lab4/images/RISC_privilege.png
 .. :align: left
 
 In this lab, you will run both kernel and user-mode programs, using `sret` to switch from S-mode to U-mode, and configuring trap handling via the following CSRs: `stvec`, `sscratch`, `sepc`, `scause`, and `sstatus`.
