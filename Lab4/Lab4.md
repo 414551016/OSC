@@ -99,7 +99,7 @@ Setup includes:
 3. Using `sret` to jump to U-mode
 
 > ✅ **Todo**  
-> Add command `exec` that can load the [user program](images/RISC_privilege.png?raw=1)  
+> Add command `exec` that can load the [user program](images/prog.bin?raw=1)  
 > <https://github.com/nycu-caslab/OSC2026/raw/main/uploads/prog.bin>  
 > in the initramfs and run it in U-mode.
 
