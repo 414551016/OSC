@@ -53,6 +53,15 @@ RISC-V provides dedicated CSRs to manage and observe the state of traps (excepti
 .. hint::
    Before diving into the code, ensure you clearly understand what information the hardware automatically writes to these registers when a trap occurs, and which registers are read by the hardware when the `sret` instruction is executed.
 
+
+<blockquote style="border-left: 4px solid green; padding-left: 1em; background:#e6f4ea">
+<strong>💡 Hint</strong><br>
+Before diving into the code, ensure you clearly understand what information
+the hardware automatically writes to these registers when a trap occurs,
+and which registers are read by the hardware when the sret instruction is executed.
+</blockquote>
+
+
 Core Timer and SBI
 ==================
 
