@@ -125,20 +125,20 @@ Result example:The result would be like this:
 
 ## Basic Exercise 2 – Core Timer Interrupt (10%)
 
-Timer interrupts are essential for OS scheduling. Steps:
+Timer interrupts are essential for OS scheduling. You will use the Supervisor Binary Interface (SBI) to program the timer. Steps:
 
-1. Read the current time using `rdtime`
-2. Add twice the CPU frequency (2 seconds)
-3. Call `sbi_set_timer(target_time)`
-4. Enable `sie.STIE`
-5. Enable global interrupts (`sstatus.SIE`)
-6. Print elapsed seconds since boot
-7. Reprogram the timer
+1. Read the current time using the `rdtime` instruction.
+2. Calculate the target time by adding twice the CPU’s frequency to the current time (this represents 2 seconds).
+3. Call `sbi_set_timer(target_time)` to schedule the interrupt.
+4. Set the `STIE` bit in the `sie` register to enable timer interrupts.
+5. Set the `SIE` bit in `sstatus` to enable global interrupts.
+6. When the interrupt triggers (checked via `scause`), print the number of seconds passed since boot.
+7. Reprogram the timer for the next 2 seconds using the SBI call again.
 
 > ✅ **Todo**  
-> Enable the core timer interrupt. The interrupt handler should print seconds after booting every 2 seconds and schedule the next timeout.
+> Enable the core timer’s interrupt. The interrupt handler should print the seconds after booting every 2 seconds and set the next timeout to 2 seconds later.
 
-Result example:
+Result example:The result would be like this:
 
 ![](images/lab4_b2.png)
 
