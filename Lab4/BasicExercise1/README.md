@@ -69,6 +69,16 @@ sepc: 0x0000000080205002
 stval: 0x0000000000000000
 
 ```
+你這份 starter code 目前不是互動式 shell 指令版本，而是：
+也就是開機後直接執行 exec("prog.bin")。這和 README 對 exec 的要求一致：exec 要找到 initrd 裡的 prog.bin，設定 CSR 後用 sret 進 U-mode。
+
+成功結果會是：
+- Starting kernel ...
+- 之後連續 5 次 trap
+- scause = 8
+- stval = 0
+- sepc 可能不同，因為文件明寫 sepc may vary。
+
 
 ## Basic Exercise 1 作業目標 + TODO 對照表
 | 作業目標                               | 對應 TODO                                          | 你要完成的內容                                                                                                   | 對應檔案      |
