@@ -69,3 +69,15 @@ sepc: 0x0000000080205002
 stval: 0x0000000000000000
 
 ```
+
+## Basic Exercise 1 作業目標 + TODO 對照表
+```
+| 作業目標                               | 對應 TODO                                          | 你要完成的內容                                                                                                   | 對應檔案      |
+| ---------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------- | --------- |
+| 從 S-mode 切到 U-mode 執行 user program | Finish `exec` in `main.c`                        | 從 initramfs 找到 `prog.bin`、解析 CPIO header、複製 user program、設定 `sepc`/`sstatus`/`sscratch`，再 `sret` 進 U-mode | `main.c`  |
+| 設定 trap 入口                         | Understand `handle_exception` in `Start.S`       | 設 `stvec` 指向 trap entry；trap 發生時先存所有暫存器與 `sepc/sstatus/scause/stval`                                      | `start.S` |
+| 定義 trap frame                      | Define the trap frame                            | `struct pt_regs` 欄位順序必須和 `start.S` 的 save/restore 順序完全一致                                                  | `main.c`  |
+| 實作 C-level exception handler       | implement `do_trap` to print `sepc` and `scause` | 印出 `sepc`、`scause`、`stval`；對 `scause == 8` 做 `sepc += 4`，避免無限重複執行 `ecall`                                 | `main.c`  |
+| 回到 U-mode 繼續執行                     | trap handling flow                               | `do_trap()` 返回後，由 `start.S` 還原 context，最後 `sret` 返回 user program                                          | `start.S` |
+
+```
