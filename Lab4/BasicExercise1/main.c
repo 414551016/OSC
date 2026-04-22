@@ -123,6 +123,13 @@ static void memcpy_simple(void* dst, const void* src, int n) {
         *d++ = *s++;
 }
 
+static int c_strlen(const char* s) {
+    int n = 0;
+    while (s[n] != '\0')
+        n++;
+    return n;
+}
+
 static int streq_cpio_name(const char* entry_name, int namesize, const char* target) {
     int i = 0;
 
@@ -147,7 +154,8 @@ static unsigned long get_initrd_start_from_dtb(void) {
     unsigned int off_strings;
     const unsigned char* p;
     const char* strings;
-    int in_chosen = 0;
+    int chosen_depth = 0;
+    int depth = 0;
 
     if (be32(&hdr->magic) != FDT_MAGIC)
         return 0;
@@ -164,18 +172,21 @@ static unsigned long get_initrd_start_from_dtb(void) {
 
         if (token == FDT_BEGIN_NODE) {
             const char* name = (const char*)p;
-            if (strcmp_simple(name, "chosen") == 0)
-                in_chosen = 1;
-            p += align((int)({ int n = 0; while (((const char*)p)[n] != '\0') n++; n + 1; }), 4);
+            depth++;
+            if (depth == 2 && strcmp_simple(name, "chosen") == 0)
+                chosen_depth = depth;
+
+            p += align(c_strlen(name) + 1, 4);
         } else if (token == FDT_END_NODE) {
-            if (in_chosen)
-                in_chosen = 0;
+            if (depth == chosen_depth)
+                chosen_depth = 0;
+            depth--;
         } else if (token == FDT_PROP) {
             unsigned int len = be32(p); p += 4;
             unsigned int nameoff = be32(p); p += 4;
             const char* propname = strings + nameoff;
 
-            if (in_chosen && strcmp_simple(propname, "linux,initrd-start") == 0) {
+            if (chosen_depth && strcmp_simple(propname, "linux,initrd-start") == 0) {
                 if (len == 8)
                     return be64(p);
                 if (len == 4)
@@ -252,8 +263,6 @@ int exec(const char* filename) {
 void do_trap(struct pt_regs* regs) {
     uart_puts("=== S-Mode trap ===\n");
     uart_puts("scause: ");
-    /* lab4_b1.png shows plain decimal-like hex without 0x preference concerns,
-       but uart_hex always prints 0x... which is acceptable */
     uart_hex(regs->scause);
     uart_puts("\n");
     uart_puts("sepc: ");
