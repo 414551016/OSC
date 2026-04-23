@@ -1,0 +1,106 @@
+專案結構
+lab3_kernel/
+├── Makefile
+├── linker.ld
+├── start.S
+├── include/
+│   ├── types.h
+│   ├── list.h
+│   ├── printk.h
+│   ├── dtb.h
+│   └── mm.h
+└── kernel/
+    ├── main.c
+    ├── printk.c
+    ├── dtb.c
+    └── mm.c
+
+13. 你要的「demo script」
+
+你已經說了「幫我做 demo script」，所以我幫你整理成 TA demo 口條版。
+
+Demo 順序
+Step 1：開機先講
+
+你一進 kernel 可以先講：
+
+這個 Lab3 kernel 先用 dtb_init() 解析 DTB，
+取得第一個 memory region、dtb size、initrd 範圍。
+接著 mm_init() 會先 reserve：
+1. DTB
+2. kernel image
+3. initramfs
+4. /reserved-memory
+
+然後用 startup_alloc() 配出 mem_map，
+最後用 buddy_init_from_reserved() 建立 buddy free list。
+Step 2：展示 reserved memory log
+
+你會看到這類：
+
+[Reserve] [0x..., 0x...)
+[Reserve] [0x..., 0x...)
+
+你就說：
+
+這些是保留區域，allocator 不會再分配它們。
+Step 3：展示 buddy allocator
+
+test_buddy() 會做：
+
+alloc_pages(0)
+alloc_pages(1)
+alloc_pages(2)
+再全部 free_pages()
+
+你要講：
+
+這裡可以看到 split log：
+[-] split to order ...
+
+也可以看到 merge log：
+[*] merge idx=... with buddy=...
+
+這表示 buddy allocator 有正確做 split / coalesce。
+Step 4：展示 kmalloc / kfree
+
+test_kmalloc() 會做：
+
+小塊分配：16 / 32 / 64 / 128
+接近 page 的分配：4000
+超過 1 page 的分配：8000
+
+你要講：
+
+小於 4KB 的 allocation 走 chunk pool。
+大於等於 4KB 的 allocation 會轉成 page allocator。
+所以這裡可以同時展示 dynamic allocator 和 page allocator 的整合。
+Step 5：展示 pool grow
+
+stress_chunk_pool() 會連續 allocate 100 個 128-byte chunk。
+
+你要講：
+
+當 free chunk 不夠時，pool_grow() 會向 buddy allocator 要新 page，
+再把那個 page 切成固定大小 chunk 放進 pool。
+14. 你現在怎麼用
+
+先重新編：
+
+make clean
+make
+
+如果這套檔案都覆蓋正確，應該就會是：
+
+成功編出 kernel.elf
+成功編出 kernel.bin
+沒有你剛剛那兩個 warning
+15. 最後提醒
+
+這份是 真正交 Lab3 kernel 版，不是 ex31/ex32 小練習版。
+你接下來如果要，我可以直接幫你做下一步其中一個：
+
+幫你檢查 nm kernel.elf / objdump 結果
+幫你補一份 U-Boot / QEMU 啟動指令
+幫你把 demo log 再改得更像助教愛看的格式
+
