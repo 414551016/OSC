@@ -1,1 +1,65 @@
+執行結果：make run
+```
+lss@DESKTOP-2MCFI1H:~/OscLab4/BasicExercise2$ make run
+rm -f kernel kernel.elf *.o
+riscv64-unknown-elf-gcc -mcmodel=medany -ffreestanding -nostdlib -g -Wall -c *.S *.c
+riscv64-unknown-elf-ld -T link.ld -o kernel.elf *.o
+riscv64-unknown-elf-objcopy -O binary kernel.elf kernel
+qemu-system-riscv64 -M virt -m 8G -kernel kernel -display none -serial stdio
 
+OpenSBI v0.9
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : riscv-virtio,qemu
+Platform Features         : timer,mfdeleg
+Platform HART Count       : 1
+Firmware Base             : 0x80000000
+Firmware Size             : 100 KB
+Runtime SBI Version       : 0.2
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080000000-0x000000008001ffff ()
+Domain0 Region01          : 0x0000000000000000-0xffffffffffffffff (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x00000000bf000000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART ISA             : rv64imafdcsu
+Boot HART Features        : scounteren,mcounteren,time
+Boot HART PMP Count       : 16
+Boot HART PMP Granularity : 4
+Boot HART PMP Address Bits: 54
+Boot HART MHPM Count      : 0
+Boot HART MHPM Count      : 0
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+
+Starting kernel ...
+boot time: 0
+boot time: 2
+boot time: 4
+boot time: 6
+boot time: 8
+boot time: 10
+boot time: 12
+boot time: 14
+boot time: 16
+boot time: 18
+boot time: 20
+boot time: 22
+
+Enable the core timer’s interrupt. The interrupt handler should print the seconds after booting every 2 seconds and set the next timeout to 2 seconds later.
+啟用核心定時器的中斷。中斷處理程序應在啟動後每 2 秒打印一次秒數，並將下一個超時設置為 2 秒後。
+```
